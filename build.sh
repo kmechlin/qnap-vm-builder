@@ -381,9 +381,10 @@ $CREATE_PATH_SECTION
 - After cloud-init finishes, **detach the cidata CD-ROM** in the VM editor and
   take a snapshot.
 - The session pre-registers two custom xrandr modes (2560×1080 21:9 and
-  2560×1440 16:9 QHD) via \`~/.xprofile\`. Pick whichever fits your monitor
-  in the desktop's Display settings. Anything larger than 2560×1600 exceeds
-  the QXL VRAM allocation VS gives the device and will fail to apply.
+  2560×1440 16:9 QHD) via \`~/.xsessionrc\` (sourced by Debian's
+  \`/etc/X11/Xsession.d/40x11-common_xsessionrc\` at login). Pick whichever
+  fits your monitor in the desktop's Display settings. Anything larger than
+  2560×1600 exceeds the QXL VRAM allocation VS gives the device.
 
 ## Performance / driver sanity checks
 

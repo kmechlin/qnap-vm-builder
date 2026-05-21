@@ -116,15 +116,20 @@ runcmd:
   # ultrawide) and 2560x1440 (16:9 QHD) so they appear in Cinnamon's
   # Display settings. Anything taller at >=2560 wide exceeds the QXL VRAM
   # budget VS gives the device, so this is the practical maximum.
+  #
+  # Drop into ~/.xsessionrc (NOT .xprofile): on Debian, the X session
+  # wrapper at /etc/X11/Xsession.d/40x11-common_xsessionrc sources
+  # ~/.xsessionrc and ignores ~/.xprofile. Using the wrong name silently
+  # leaves the modes unregistered until the user re-runs the script.
   - |
-    cat > /home/${USERNAME}/.xprofile <<'XPROF'
+    cat > /home/${USERNAME}/.xsessionrc <<'XSRC'
     xrandr --newmode "2560x1080_60.00" 230.00 2560 2720 2992 3424 1080 1083 1093 1120 -hsync +vsync 2>/dev/null || true
     xrandr --addmode Virtual-1 "2560x1080_60.00" 2>/dev/null || true
     xrandr --newmode "2560x1440_60.00" 312.25 2560 2752 3024 3488 1440 1443 1448 1493 -hsync +vsync 2>/dev/null || true
     xrandr --addmode Virtual-1 "2560x1440_60.00" 2>/dev/null || true
-    XPROF
-  - chown ${USERNAME}:${USERNAME} /home/${USERNAME}/.xprofile
-  - chmod 0755 /home/${USERNAME}/.xprofile
+    XSRC
+  - chown ${USERNAME}:${USERNAME} /home/${USERNAME}/.xsessionrc
+  - chmod 0755 /home/${USERNAME}/.xsessionrc
 
   # --- VS Code (Microsoft apt repo) ---
   - install -d -m 0755 /etc/apt/keyrings

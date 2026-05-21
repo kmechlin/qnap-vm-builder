@@ -39,7 +39,7 @@
       <Description>The bridged network</Description>
     </Network>
   </NetworkSection>
-  <VirtualSystem ovf:id="${VMNAME}" ovfCreation="${OVF_CREATION_TS}" osType="debian13" arch="x86" vsBios="ovmf">
+  <VirtualSystem ovf:id="${VMNAME}" ovfCreation="${OVF_CREATION_TS}" osType="${OVF_OS_TYPE}" arch="x86" vsBios="ovmf">
     <Info>A virtual machine</Info>
     <Name>${VMNAME}</Name>
     <OperatingSystemSection ovf:id="102" vmw:osType="otherGuest64">

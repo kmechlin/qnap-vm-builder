@@ -33,10 +33,11 @@ SEED=""
 OUTDIR=""
 CPU_COUNT="4"
 MEMORY_MIB="8192"
+OVF_OS_TYPE="debian13"   # default keeps existing behaviour; build.sh passes -O explicitly
 
 usage() { sed -n '2,28p' "$0" | sed 's/^# \{0,1\}//'; }
 
-while getopts ":n:q:s:d:c:m:h" opt; do
+while getopts ":n:q:s:d:c:m:O:h" opt; do
   case "$opt" in
     n) VMNAME="$OPTARG" ;;
     q) QCOW2="$OPTARG" ;;
@@ -44,6 +45,7 @@ while getopts ":n:q:s:d:c:m:h" opt; do
     d) OUTDIR="$OPTARG" ;;
     c) CPU_COUNT="$OPTARG" ;;
     m) MEMORY_MIB="$OPTARG" ;;
+    O) OVF_OS_TYPE="$OPTARG" ;;
     h) usage; exit 0 ;;
     \?) echo "Unknown option: -$OPTARG" >&2; usage; exit 1 ;;
     :)  echo "Option -$OPTARG requires an argument." >&2; exit 1 ;;
@@ -124,9 +126,9 @@ OVF_CREATION_TS="$(date -u '+%Y-%m-%d %H:%M:%S.%6N')"
 echo ">> Rendering OVF: $OVF_OUT"
 export VMNAME DISK_FILENAME SEED_FILENAME DISK_FILE_SIZE SEED_FILE_SIZE \
        DISK_CAPACITY_BYTES CPU_COUNT MEMORY_MIB \
-       DISK_UUID VBOX_MACHINE_UUID MAC_ADDR OVF_CREATION_TS
+       DISK_UUID VBOX_MACHINE_UUID MAC_ADDR OVF_CREATION_TS OVF_OS_TYPE
 envsubst \
-  '${VMNAME} ${DISK_FILENAME} ${SEED_FILENAME} ${DISK_FILE_SIZE} ${SEED_FILE_SIZE} ${DISK_CAPACITY_BYTES} ${CPU_COUNT} ${MEMORY_MIB} ${DISK_UUID} ${VBOX_MACHINE_UUID} ${MAC_ADDR} ${OVF_CREATION_TS}' \
+  '${VMNAME} ${DISK_FILENAME} ${SEED_FILENAME} ${DISK_FILE_SIZE} ${SEED_FILE_SIZE} ${DISK_CAPACITY_BYTES} ${CPU_COUNT} ${MEMORY_MIB} ${DISK_UUID} ${VBOX_MACHINE_UUID} ${MAC_ADDR} ${OVF_CREATION_TS} ${OVF_OS_TYPE}' \
   < "$TPL" > "$OVF_OUT"
 
 # Optional well-formed-XML sanity check.

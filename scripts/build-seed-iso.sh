@@ -6,9 +6,13 @@
 # (Variables expanded with envsubst: USERNAME, PWHASH, VMHOSTNAME.)
 #
 # Usage:
-#   ./build-seed-iso.sh [-u username] [-p 'password'] [-H hostname] [-o output.iso] [-d outdir]
+#   ./build-seed-iso.sh [-u username] [-p 'password'] [-H hostname]
+#                       [-o output.iso] [-d outdir] [-t template-dir]
 #
-# Defaults:  -u kmechlin   -p 'Ch4ng3m3!'   -H dev-vm   -o seed.iso   -d $(dirname output.iso)
+# Defaults:  -u kmechlin   -p 'Ch4ng3m3!'   -H dev-vm   -o seed.iso
+#            -d $(dirname output.iso)
+#            -t $(dirname "$0")/cloud-init   (legacy, used when build.sh
+#                                            doesn't pass an explicit -t)
 #
 # Notes:
 #   * Quote the password if it contains shell metacharacters, e.g. -p 'Ch4ng3m3!'
@@ -25,16 +29,18 @@ PASSWORD='Ch4ng3m3!'
 VMHOSTNAME="dev-vm"
 OUTPUT="seed.iso"
 OUTDIR=""
+TPL_DIR=""
 
-usage() { sed -n '2,18p' "$0" | sed 's/^# \{0,1\}//'; }
+usage() { sed -n '2,20p' "$0" | sed 's/^# \{0,1\}//'; }
 
-while getopts ":u:p:H:o:d:h" opt; do
+while getopts ":u:p:H:o:d:t:h" opt; do
   case "$opt" in
     u) USERNAME="$OPTARG" ;;
     p) PASSWORD="$OPTARG" ;;
     H) VMHOSTNAME="$OPTARG" ;;
     o) OUTPUT="$OPTARG" ;;
     d) OUTDIR="$OPTARG" ;;
+    t) TPL_DIR="$OPTARG" ;;
     h) usage; exit 0 ;;
     \?) echo "Unknown option: -$OPTARG" >&2; usage; exit 1 ;;
     :)  echo "Option -$OPTARG requires an argument." >&2; exit 1 ;;
@@ -42,7 +48,9 @@ while getopts ":u:p:H:o:d:h" opt; do
 done
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-TPL_DIR="$SCRIPT_DIR/cloud-init"
+# Default template dir kept for backwards compatibility — `build.sh` always
+# passes `-t distros/<name>/cloud-init` explicitly now.
+[[ -z "$TPL_DIR" ]] && TPL_DIR="$SCRIPT_DIR/cloud-init"
 
 if [[ ! -f "$TPL_DIR/user-data.tpl" || ! -f "$TPL_DIR/meta-data.tpl" ]]; then
   echo "ERROR: templates not found in $TPL_DIR" >&2
